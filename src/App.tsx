@@ -6,6 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import CreateCourse from "./pages/CreateCourse";
+import Courses from "./pages/Courses";
+import Students from "./pages/Students";
+import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
+import WalletPage from "./pages/Wallet";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,14 +27,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create-course" element={<Dashboard />} />
-          <Route path="/courses" element={<Dashboard />} />
-          <Route path="/students" element={<Dashboard />} />
-          <Route path="/messages" element={<Dashboard />} />
-          <Route path="/notifications" element={<Dashboard />} />
-          <Route path="/wallet" element={<Dashboard />} />
-          <Route path="/profile" element={<Dashboard />} />
-          <Route path="/settings" element={<Dashboard />} />
+          <Route path="/create-course" element={<CreateCourse />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
