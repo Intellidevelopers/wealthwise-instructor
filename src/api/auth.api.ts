@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000'; // Replace with your actual backend base URL
+const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
 
 export const signupInstructor = async (formData: {
   firstName: string;
