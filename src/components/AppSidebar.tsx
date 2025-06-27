@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -11,17 +10,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { 
-  Home, 
-  Calendar, 
-  Users, 
-  Bell, 
-  Wallet, 
-  User, 
+import {
+  Home,
+  Calendar,
+  Users,
+  Bell,
+  Wallet,
+  User,
   Settings,
   Plus,
-  MessageSquare
+  MessageSquare,
+  LogOut
 } from 'lucide-react';
+import { logoutInstructor } from '@/api/auth.api';
+import { toast } from 'sonner';
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: Home },
@@ -39,9 +41,22 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
+
+  const handleLogout = async () => {
+    try {
+      await logoutInstructor();
+      localStorage.removeItem('instructorToken');
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to logout');
+    }
+  };
 
   return (
     <Sidebar className={`${collapsed ? 'w-16' : 'w-64'} border-r bg-white shadow-sm`}>
@@ -81,6 +96,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              {/* Logout Button */}
+              <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={handleLogout}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    {!collapsed && <span>Logout</span>}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

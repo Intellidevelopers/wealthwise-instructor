@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
+import { signupInstructor } from '@/api/auth.api';
 
 interface RegisterProps {
   onNext: () => void;
@@ -13,6 +13,8 @@ interface RegisterProps {
 }
 
 const Register = ({ onNext, onSignIn }: RegisterProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -20,50 +22,73 @@ const Register = ({ onNext, onSignIn }: RegisterProps) => {
     phone: '',
     password: '',
     confirmPassword: '',
-    agreeTerms: false
+    agreeTerms: false,
   });
+
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return;
-    }
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!formData.agreeTerms) {
-      toast({
-        title: "Error",
-        description: "Please agree to the terms and conditions",
-        variant: "destructive"
-      });
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    toast({
+      title: 'Error',
+      description: 'Passwords do not match',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if (!formData.agreeTerms) {
+    toast({
+      title: 'Error',
+      description: 'Please agree to the terms and conditions',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const { userId } = await signupInstructor({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+    });
+
+    localStorage.setItem('instructorUserId', userId);
+    localStorage.setItem('instructorEmail', formData.email);
 
     toast({
-      title: "Registration Successful",
-      description: "OTP sent to your email address"
+      title: 'Registration Successful',
+      description: 'OTP sent to your email address',
     });
+
     onNext();
-  };
+  } catch (error) {
+    toast({
+      title: 'Signup Failed',
+      description: error?.response?.data?.message || 'Something went wrong',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   return (
-    <AuthLayout 
-      title="Create Account" 
-      subtitle="Join WealthWise as an instructor"
-    >
+    <AuthLayout title="Create Account" subtitle="Join WealthWise as an instructor">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -139,25 +164,31 @@ const Register = ({ onNext, onSignIn }: RegisterProps) => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="terms" 
+          <Checkbox
+            id="terms"
             checked={formData.agreeTerms}
             onCheckedChange={(checked) => handleInputChange('agreeTerms', checked as boolean)}
           />
           <Label htmlFor="terms" className="text-sm">
-            I agree to the <span className="text-wealthwise-700 cursor-pointer">Terms and Conditions</span>
+            I agree to the{' '}
+            <span className="text-wealthwise-700 cursor-pointer">Terms and Conditions</span>
           </Label>
         </div>
 
-        <Button type="submit" className="w-full bg-wealthwise-700 hover:bg-wealthwise-800">
-          Create Account
+        <Button
+          type="submit"
+          className="w-full bg-wealthwise-700 hover:bg-wealthwise-800"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
+
 
         <div className="text-center">
           <span className="text-sm text-gray-600">
             Already have an account?{' '}
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onSignIn}
               className="text-wealthwise-700 font-medium hover:underline"
             >

@@ -1,11 +1,13 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
+import AuthLayout from './../components/AuthLayout';
+import { loginInstructor } from '@/api/auth.api';
+import { useNavigate } from 'react-router-dom';
+
 
 interface LoginProps {
   onLogin: () => void;
@@ -14,21 +16,41 @@ interface LoginProps {
 }
 
 const Login = ({ onLogin, onSignUp, onForgotPassword }: LoginProps) => {
+    const navigate = useNavigate(); // ✅ React Router
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    toast({
-      title: "Login Successful",
-      description: "Welcome back to WealthWise!"
-    });
-    onLogin();
+    setIsLoading(true);
+
+    try {
+      const { token, user } = await loginInstructor(formData.email, formData.password);
+      
+      localStorage.setItem('instructorToken', token);
+      localStorage.setItem('instructorData', JSON.stringify(user));
+
+      toast({
+        title: 'Login Successful',
+        description: `Welcome back, ${user.firstName}!`
+      });
+
+      navigate('/dashboard'); // ✅ Navigate to login screen
+      
+    } catch (error) {
+      toast({
+        title: 'Login Failed',
+        description: error?.response?.data?.message || 'Invalid email or password',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -88,8 +110,12 @@ const Login = ({ onLogin, onSignUp, onForgotPassword }: LoginProps) => {
           </button>
         </div>
 
-        <Button type="submit" className="w-full bg-wealthwise-700 hover:bg-wealthwise-800">
-          Sign In
+        <Button 
+          type="submit" 
+          className="w-full bg-wealthwise-700 hover:bg-wealthwise-800"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Signing In...' : 'Sign In'}
         </Button>
 
         <div className="text-center">

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Register from '@/components/Register';
 import OTPVerification from '@/components/OTPVerification';
-import Login from '@/components/Login';
+import Login from '../pages/Login';
 import ForgotPassword from '@/components/ForgotPassword';
 import ResetPassword from '@/components/ResetPassword';
 import Dashboard from './Dashboard';
@@ -13,7 +13,7 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState<AuthStep>('login');
 
   const handleAuthComplete = () => {
-    setCurrentStep('dashboard');
+    setCurrentStep('login');
   };
 
   const renderCurrentStep = () => {
@@ -32,7 +32,9 @@ const Index = () => {
       case 'reset-password':
         return <ResetPassword onComplete={() => setCurrentStep('login')} />;
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <Dashboard/>
+        );
       default:
         return (
           <Login 

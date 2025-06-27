@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { DashboardStats } from '@/components/DashboardStats';
 import { RecentActivity } from '@/components/RecentActivity';
@@ -8,28 +7,69 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Calendar, Users, DollarSign } from 'lucide-react';
+import { logoutInstructor } from '@/api/auth.api';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+
+interface Instructor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  [key: string]: unknown; // allow extra fields
+}
 
 const Dashboard = () => {
+  const [instructor, setInstructor] = useState<Instructor | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('instructorData');
+    const storedToken = localStorage.getItem('instructorToken');
+
+    if (storedUser && storedToken) {
+      try {
+        setInstructor(JSON.parse(storedUser));
+        setToken(storedToken);
+      } catch (err) {
+        console.error('Error parsing instructor data', err);
+      }
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutInstructor();
+      localStorage.removeItem('instructorToken');
+      toast.success('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      console.error(error);
+      toast.error('Logout failed');
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Welcome message */}
+        
+
         {/* Stats Cards */}
         <DashboardStats />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity - Takes 2 columns on desktop */}
           <div className="lg:col-span-2">
             <RecentActivity />
           </div>
-
-          {/* Upcoming Tasks */}
           <div>
             <UpcomingTasks />
           </div>
         </div>
 
-        {/* Additional Dashboard Cards */}
+        {/* Additional Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Monthly Progress */}
           <Card>
@@ -41,27 +81,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Course Completion</span>
-                    <span>78%</span>
-                  </div>
-                  <Progress value={78} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Student Engagement</span>
-                    <span>92%</span>
-                  </div>
-                  <Progress value={92} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Revenue Goal</span>
-                    <span>65%</span>
-                  </div>
-                  <Progress value={65} className="h-2" />
-                </div>
+                <ProgressRow label="Course Completion" value={78} />
+                <ProgressRow label="Student Engagement" value={92} />
+                <ProgressRow label="Revenue Goal" value={65} />
               </div>
             </CardContent>
           </Card>
@@ -95,24 +117,10 @@ const Dashboard = () => {
               <CardTitle>This Week</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Sessions Conducted</span>
-                  <span className="font-semibold">12</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Assignments Graded</span>
-                  <span className="font-semibold">45</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Messages Replied</span>
-                  <span className="font-semibold">28</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Course Updates</span>
-                  <span className="font-semibold">6</span>
-                </div>
-              </div>
+              <PerformanceRow label="Sessions Conducted" value={12} />
+              <PerformanceRow label="Assignments Graded" value={45} />
+              <PerformanceRow label="Messages Replied" value={28} />
+              <PerformanceRow label="Course Updates" value={6} />
             </CardContent>
           </Card>
         </div>
@@ -122,3 +130,21 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// Reusable subcomponents
+const ProgressRow = ({ label, value }: { label: string; value: number }) => (
+  <div>
+    <div className="flex justify-between text-sm mb-2">
+      <span>{label}</span>
+      <span>{value}%</span>
+    </div>
+    <Progress value={value} className="h-2" />
+  </div>
+);
+
+const PerformanceRow = ({ label, value }: { label: string; value: number }) => (
+  <div className="flex justify-between items-center mb-2">
+    <span className="text-sm text-gray-600">{label}</span>
+    <span className="font-semibold">{value}</span>
+  </div>
+);
