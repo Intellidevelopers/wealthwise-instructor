@@ -7,7 +7,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 
-const Register = ({ onNext }: { onNext: () => void }) => {
+interface RegisterProps {
+  onNext: () => void;
+  onSignIn?: () => void;
+}
+
+const Register = ({ onNext, onSignIn }: RegisterProps) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -151,7 +156,11 @@ const Register = ({ onNext }: { onNext: () => void }) => {
         <div className="text-center">
           <span className="text-sm text-gray-600">
             Already have an account?{' '}
-            <button type="button" className="text-wealthwise-700 font-medium hover:underline">
+            <button 
+              type="button" 
+              onClick={onSignIn}
+              className="text-wealthwise-700 font-medium hover:underline"
+            >
               Sign In
             </button>
           </span>

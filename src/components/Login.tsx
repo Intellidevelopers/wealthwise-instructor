@@ -7,7 +7,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 
-const Login = ({ onLogin }: { onLogin: () => void }) => {
+interface LoginProps {
+  onLogin: () => void;
+  onSignUp: () => void;
+  onForgotPassword: () => void;
+}
+
+const Login = ({ onLogin, onSignUp, onForgotPassword }: LoginProps) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -73,7 +79,11 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
               Remember me
             </Label>
           </div>
-          <button type="button" className="text-sm text-wealthwise-700 hover:underline">
+          <button 
+            type="button" 
+            onClick={onForgotPassword}
+            className="text-sm text-wealthwise-700 hover:underline"
+          >
             Forgot Password?
           </button>
         </div>
@@ -85,7 +95,11 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
         <div className="text-center">
           <span className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <button type="button" className="text-wealthwise-700 font-medium hover:underline">
+            <button 
+              type="button" 
+              onClick={onSignUp}
+              className="text-wealthwise-700 font-medium hover:underline"
+            >
               Create Account
             </button>
           </span>
