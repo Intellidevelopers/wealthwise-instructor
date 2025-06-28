@@ -41,7 +41,7 @@ export const getCourses = async () => {
   const token = localStorage.getItem('instructorToken');
   if (!token) throw new Error('Instructor token not found in localStorage');
 
-  const response = await axios.get(`${API_BASE_URL}/api/courses`, {
+  const response = await axios.get(`${API_BASE_URL}/api/instructor/courses`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
