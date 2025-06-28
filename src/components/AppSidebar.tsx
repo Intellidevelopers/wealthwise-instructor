@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +9,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   Calendar,
@@ -20,7 +20,7 @@ import {
   Settings,
   Plus,
   MessageSquare,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 import { logoutInstructor } from '@/api/auth.api';
 import { toast } from 'sonner';
@@ -37,14 +37,17 @@ const menuItems = [
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  forceOpen?: boolean; // ✅ Optional prop to override collapsed
+}
+
+export function AppSidebar({ forceOpen }: AppSidebarProps) {
   const { state } = useSidebar();
-  const collapsed = state === 'collapsed';
+  const collapsed = forceOpen ? false : state === 'collapsed';
   const location = useLocation();
   const navigate = useNavigate();
-  const currentPath = location.pathname;
 
-  const isActive = (path: string) => currentPath === path;
+  const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -99,14 +102,14 @@ export function AppSidebar() {
 
               {/* Logout Button */}
               <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    {!collapsed && <span>Logout</span>}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={handleLogout}
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  {!collapsed && <span>Logout</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

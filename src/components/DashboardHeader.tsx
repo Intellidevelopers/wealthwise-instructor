@@ -5,6 +5,11 @@ import { Bell, MessageSquare, Plus, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getInstructorProfile, updateInstructorProfile } from '@/api/auth.api';
 import { useToast } from '@/hooks/use-toast';
+import { Menu } from 'lucide-react';
+
+interface DashboardHeaderProps {
+  onMenuClick?: () => void; // Accept toggle function
+}
 
 
 
@@ -20,7 +25,7 @@ interface InstructorProfile {
 }
 
 
-export function DashboardHeader() {
+export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   const [instructorName, setInstructorName] = useState('Instructor');
     const [formData, setFormData] = useState<InstructorProfile | null>(null);
     const [profile, setProfile] = useState<InstructorProfile | null>(null);
@@ -58,9 +63,16 @@ export function DashboardHeader() {
       fetchProfile();
     }, [toast]);
 
+  // Removed duplicate onMenuClick function to avoid identifier conflict.
+
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
       <div className="flex items-center justify-between">
+        <div className="lg:hidden">
+        <button onClick={onMenuClick} className="p-2 rounded-md hover:bg-gray-100">
+          <Menu className="w-6 h-6 text-gray-800" />
+        </button>
+      </div>
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
             Good morning, {instructorName}!
