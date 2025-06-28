@@ -24,6 +24,10 @@ const Notifications = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+const [pageLoading, setPageLoading] = useState(true); // for spinner
+const [showModal, setShowModal] = useState(false);
+
+
 
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
@@ -45,18 +49,33 @@ const Notifications = () => {
     }
   };
 
-  const fetchNotifications = async () => {
-    try {
-      const data = await getInstructorNotifications();
-      setNotifications(data);
-    } catch (error) {
-      toast.error('Failed to load recent notifications.');
-    }
-  };
+const fetchNotifications = async () => {
+  try {
+    setPageLoading(true); // 👈 start spinner
+    const data = await getInstructorNotifications();
+    setNotifications(data);
+  } catch (error) {
+    toast.error('Failed to load recent notifications.');
+  } finally {
+    setPageLoading(false); // 👈 stop spinner
+  }
+};
+
 
   useEffect(() => {
     fetchNotifications();
   }, []);
+
+if (pageLoading) {
+  return (
+    <DashboardLayout>
+      <div className="flex justify-center items-center h-[70vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-600" />
+      </div>
+    </DashboardLayout>
+  );
+}
+
 
   return (
     <DashboardLayout>
@@ -101,23 +120,30 @@ const Notifications = () => {
                 >
                   {loading ? 'Sending...' : 'Send Now'}
                 </Button>
+
               </div>
             </CardContent>
           </Card>
 
           {/* Fetched Notifications */}
           <Card>
-            <CardHeader>
+            <CardHeader className='flex-row items-center justify-between'>
               <CardTitle className="flex items-center space-x-2">
                 <Bell className="w-5 h-5" />
                 <span>Recent Notifications</span>
               </CardTitle>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="text-purple-600 text-sm hover:underline"
+                >
+                  See All Notifications
+                </button>
             </CardHeader>
             <CardContent className="space-y-3">
               {notifications.length === 0 ? (
                 <p className="text-sm text-gray-600">No notifications sent yet.</p>
               ) : (
-                notifications.map((notif) => (
+                notifications.slice(0, 3).map((notif) => (
                   <div key={notif._id} className="p-3 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{notif.title}</h4>
@@ -138,6 +164,41 @@ const Notifications = () => {
             </CardContent>
           </Card>
         </div>
+        {showModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg max-w-lg w-full max-h-[80vh] overflow-y-auto p-6 relative">
+      <h2 className="text-lg font-semibold mb-4">All Notifications</h2>
+      <button
+        onClick={() => setShowModal(false)}
+        className="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-xl"
+      >
+        ×
+      </button>
+      {notifications.length === 0 ? (
+        <p className="text-sm text-gray-600">No notifications found.</p>
+      ) : (
+        notifications.map((notif) => (
+          <div key={notif._id} className="p-3 border rounded-lg mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium">{notif.title}</h4>
+              <span className="text-xs text-gray-500">
+                {dayjs(notif.createdAt).fromNow()}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600">{notif.message}</p>
+            <div className="flex items-center space-x-2 mt-2">
+              <Users className="w-4 h-4 text-gray-500" />
+              <span className="text-xs text-gray-500">
+                {notif.recipientCount} recipients
+              </span>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
+
       </div>
     </DashboardLayout>
   );

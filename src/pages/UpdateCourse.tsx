@@ -26,6 +26,7 @@ const UpdateCourse = () => {
   });
   const [categories, setCategories] = useState([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+const [loading, setLoading] = useState(true); // 👈 add this
 
   // Fetch categories and course data
 
@@ -34,13 +35,12 @@ const UpdateCourse = () => {
 useEffect(() => {
   const fetchInitialData = async () => {
     try {
+      setLoading(true); // 👈 start loading
       const [catData, courseData] = await Promise.all([
         getCategories(),
-        getCourseById(courseId!), // ✅ use API function
+        getCourseById(courseId!),
       ]);
-
       setCategories(catData);
-
       const c = courseData;
       setFormData({
         title: c.title,
@@ -54,11 +54,14 @@ useEffect(() => {
       setImagePreview(c.thumbnail);
     } catch (err) {
       toast({ title: 'Error', description: 'Failed to load data.', variant: 'destructive' });
+    } finally {
+      setLoading(false); // 👈 stop loading
     }
   };
 
   fetchInitialData();
 }, [courseId, toast]);
+
 
 
   const handleChange = (field: string, value: string) => {
@@ -93,7 +96,15 @@ useEffect(() => {
   }
 };
 
-
+if (loading) {
+  return (
+    <DashboardLayout>
+      <div className="flex justify-center items-center h-[70vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-600" />
+      </div>
+    </DashboardLayout>
+  );
+}
   return (
     <DashboardLayout>
       <div className="space-y-6">

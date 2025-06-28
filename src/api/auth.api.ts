@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
+const API_BASE_URL = 'http://localhost:5000'; // Replace with your actual backend base URL
 
 export const signupInstructor = async (formData: {
   firstName: string;
@@ -49,8 +49,6 @@ export const getCourses = async () => {
 
   return response.data;
 };
-
-
 
 export const createCourse = async (formData: FormData) => {
   const token = localStorage.getItem('instructorToken');
@@ -143,5 +141,132 @@ export const logoutInstructor = async () => {
     }
   );
 
+  return response.data;
+};
+
+export const getInstructorStats = async () => {
+  const token = localStorage.getItem('instructorToken');
+  if (!token) throw new Error('Instructor token not found in localStorage');
+
+  const response = await axios.get(
+    `${API_BASE_URL}/api/instructor/stats`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+// Get instructor activities function
+export const getInstructorActivities = async () => {
+  const token = localStorage.getItem('instructorToken');
+  if (!token) throw new Error('Instructor token not found in localStorage');
+
+  const response = await axios.get(`${API_BASE_URL}/api/instructor/activities`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data; // Assuming it returns an array of activity objects
+};
+
+// Get Instructor Enrolled Students function
+export const getInstructorEnrolledStudents = async () => {
+  const token = localStorage.getItem('instructorToken');
+  if (!token) throw new Error('Instructor token not found in localStorage');
+
+  const response = await axios.get(`${API_BASE_URL}/api/instructor/enrolled-students`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data; // Will return the list of enrolled students with course titles
+};
+
+// Get Instructor Profile function
+export const getInstructorProfile = async () => {
+  const token = localStorage.getItem('instructorToken');
+  if (!token) throw new Error('Instructor token not found in localStorage');
+
+  const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+// Update Instructor Profile function
+// This function allows instructors to update their profile information
+export const updateInstructorProfile = async (formData: FormData) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.put(`${API_BASE_URL}/api/auth/profile`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+// Messagess API Function
+
+export const getConversations = async () => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(`${API_BASE_URL}/api/messages/conversations`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+
+export const getMessagesByConversationId = async (conversationId: string) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(
+    `${API_BASE_URL}/api/messages/conversations/${conversationId}/messages`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+
+export const sendMessage = async (conversationId: string, text: string) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.post(
+    `${API_BASE_URL}/api/messages/conversations/${conversationId}/messages`,
+    { text },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+
+export const createOrGetConversation = async (userId: string) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.post(
+    `${API_BASE_URL}/api/messages/conversations`,
+    { userId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };

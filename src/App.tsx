@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import UpdateCourse from "./pages/UpdateCourse";
 import ProtectedRoute from './components/ProtectedRoute';
 
+
 const queryClient = new QueryClient();
 
 const App = () => (

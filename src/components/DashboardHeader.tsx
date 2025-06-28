@@ -1,11 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, MessageSquare, Plus } from 'lucide-react';
+import { Bell, MessageSquare, Plus, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { getInstructorProfile, updateInstructorProfile } from '@/api/auth.api';
+import { useToast } from '@/hooks/use-toast';
+
+
+
+interface InstructorProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  bio?: string;
+  specialization?: string;
+  avatar?: string;
+  avatarFile?: File; // 👉 temporary upload file
+}
+
 
 export function DashboardHeader() {
   const [instructorName, setInstructorName] = useState('Instructor');
+    const [formData, setFormData] = useState<InstructorProfile | null>(null);
+    const [profile, setProfile] = useState<InstructorProfile | null>(null);
+  const { toast } = useToast();
+  
 
   useEffect(() => {
     const stored = localStorage.getItem('instructorData');
@@ -18,6 +38,25 @@ export function DashboardHeader() {
       }
     }
   }, []);
+
+    // Fetch profile on mount
+    useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const data = await getInstructorProfile();
+          setProfile(data);
+          setFormData(data);
+        } catch (err) {
+          toast({
+            title: 'Error',
+            description: 'Failed to load profile',
+            variant: 'destructive',
+          });
+        }
+      };
+  
+      fetchProfile();
+    }, [toast]);
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
@@ -52,10 +91,14 @@ export function DashboardHeader() {
               </Badge>
             </Button>
           </div>
-
+                            
           {/* Avatar */}
           <Avatar className="w-8 h-8">
-            <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150" />
+          {formData?.avatar ? (
+            <AvatarImage src={formData.avatar} />
+            ) : (
+            <User className="w-16 h-16 text-wealthwise-700 mx-auto mt-8" />
+          )}
             <AvatarFallback>
               {instructorName
                 .split(' ')

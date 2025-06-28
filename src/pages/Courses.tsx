@@ -96,10 +96,13 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
         </div>
 
         {loading ? (
-          <p>Loading courses...</p>
+          <div className="flex justify-center items-center h-60">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-purple-600" />
+          </div>
         ) : courses.length === 0 ? (
-          <p>No courses found.</p>
+          <p className="text-center text-gray-500">No courses found.</p>
         ) : (
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <Card key={course._id} className="hover:shadow-lg transition-shadow">
@@ -149,8 +152,7 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
                       <span>{course.students || 0} students</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <DollarSign className="w-4 h-4 text-gray-500" />
-                      <span>${course.price}</span>
+                      <span className='text-lg font-bold'>${course.price}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
