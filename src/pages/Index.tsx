@@ -19,7 +19,13 @@ const Index = () => {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 'register':
-        return <Register onNext={() => setCurrentStep('otp')} />;
+  return (
+    <Register 
+      onNext={() => setCurrentStep('otp')}
+      onSignIn={() => setCurrentStep('login')} // ✅ Add this
+    />
+  );
+
       case 'otp':
         return <OTPVerification onNext={handleAuthComplete} />;
       case 'forgot-password':

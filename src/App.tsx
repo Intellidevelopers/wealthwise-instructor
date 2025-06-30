@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import UpdateCourse from "./pages/UpdateCourse";
 import ProtectedRoute from './components/ProtectedRoute';
+import Register from "./components/Register";
 
 
 const queryClient = new QueryClient();
@@ -120,6 +121,16 @@ const App = () => (
                 onLogin={() => {}}
                 onSignUp={() => {}}
                 onForgotPassword={() => {}}
+              />
+            }
+          />
+
+          <Route
+            path="/register"
+            element={
+              <Register 
+              onNext={() => {}} 
+              onSignIn={() => {}}
               />
             }
           />

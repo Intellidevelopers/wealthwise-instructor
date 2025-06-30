@@ -6,6 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { signupInstructor } from '@/api/auth.api';
+import { useNavigate } from 'react-router-dom';
+
 
 interface RegisterProps {
   onNext: () => void;
@@ -14,6 +16,7 @@ interface RegisterProps {
 
 const Register = ({ onNext, onSignIn }: RegisterProps) => {
   const [isLoading, setIsLoading] = useState(false);
+const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -189,7 +192,8 @@ const Register = ({ onNext, onSignIn }: RegisterProps) => {
             Already have an account?{' '}
             <button
               type="button"
-              onClick={onSignIn}
+              onClick={() => navigate('/login')}
+
               className="text-wealthwise-700 font-medium hover:underline"
             >
               Sign In

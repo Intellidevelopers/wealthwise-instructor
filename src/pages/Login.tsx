@@ -123,7 +123,8 @@ const Login = ({ onLogin, onSignUp, onForgotPassword }: LoginProps) => {
             Don't have an account?{' '}
             <button 
               type="button" 
-              onClick={onSignUp}
+              onClick={() => navigate('/register')}
+
               className="text-wealthwise-700 font-medium hover:underline"
             >
               Create Account
