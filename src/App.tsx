@@ -70,6 +70,8 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route path="/messages/:userId" element={<Messages />} />
+
           <Route
             path="/notifications"
             element={

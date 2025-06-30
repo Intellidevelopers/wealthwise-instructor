@@ -12,6 +12,9 @@ import {
 import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 import toast, { Toaster } from 'react-hot-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useParams } from 'react-router-dom';
+
 
 
 const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
@@ -48,28 +51,29 @@ const Messages = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const { userId } = useParams(); // 🚀 get route param
+
 
   const token = localStorage.getItem('instructorToken');
   const currentUserId = token ? (jwtDecode(token) as DecodedToken).id : '';
 
   let typingTimeout: NodeJS.Timeout;
 
-  useEffect(() => {
-    (async () => {
-      const data = await getConversations();
-      setConversations(data);
-    })();
+useEffect(() => {
+  (async () => {
+    const data = await getConversations();
+    setConversations(data);
 
-    // Track online users
-    socket.on('userOnline', (userIds: string[]) => {
-      setOnlineUsers(userIds);
-    });
+    // 👇 If userId exists in URL, auto-activate the correct conversation
+    if (userId) {
+      const match = data.find((conv) => conv.participant._id === userId);
+      if (match) {
+        setActiveConversation(match);
+      }
+    }
+  })();
+}, [userId]);
 
-    return () => {
-      socket.off('userOnline');
-    };
-  }, []);
 
   useEffect(() => {
     if (activeConversation) {
@@ -164,19 +168,30 @@ useEffect(() => {
                 <div
                   key={conv._id}
                   onClick={() => setActiveConversation(conv)}
-                  className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                  className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 flex items-center space-x-3 ${
                     activeConversation?._id === conv._id ? 'bg-gray-100' : ''
                   }`}
                 >
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">
-                      {conv.participant.firstName} {conv.participant.lastName}
-                    </h4>
-                    {onlineUsers.includes(conv.participant._id) && (
-                      <span className="text-green-500 text-xs">● Online</span>
-                    )}
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage
+                      src={conv.participant.avatar || '/default-avatar.png'}
+                      alt="User avatar"
+                    />
+                    <AvatarFallback>
+                      <img src="/user.png" alt="Fallback avatar" className="w-full h-full object-cover rounded-full" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">
+                        {conv.participant.firstName} {conv.participant.lastName}
+                      </h4>
+                      {onlineUsers.includes(conv.participant._id) && (
+                        <span className="text-green-500 text-xs">● Online</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 truncate">Click to view chat</p>
                   </div>
-                  <p className="text-sm text-gray-600 truncate">Click to view chat</p>
                 </div>
               ))}
             </CardContent>

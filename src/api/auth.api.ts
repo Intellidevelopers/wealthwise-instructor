@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
+const API_BASE_URL = 'http://localhost:5000'; // Replace with your actual backend base URL
+// const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
 
 export const signupInstructor = async (formData: {
   firstName: string;
@@ -269,4 +270,26 @@ export const createOrGetConversation = async (userId: string) => {
     }
   );
   return response.data;
+};
+
+
+// ✅ Get total unread message counts across all conversations
+export const getUnreadMessageCounts = async () => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(`${API_BASE_URL}/api/messages/unread-counts`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getRecentUnreadMessages = async () => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(`${API_BASE_URL}/api/messages/recent-unread`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data; // should be [{ text, sender: { firstName, lastName, avatar }, createdAt }]
 };
