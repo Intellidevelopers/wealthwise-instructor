@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 const CreateCourse = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-
+ const [loading, setLoading] = useState(false);
   type CourseFormData = {
     title: string;
     description: string;
@@ -36,7 +36,6 @@ const CreateCourse = () => {
   });
 
   const [categories, setCategories] = useState([]);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -58,9 +57,15 @@ const handleSubmit = async () => {
   const { title, description, price, duration, video, category, thumbnailFile } = formData;
 
   if (!title || !description || !price || !duration || !thumbnailFile || !video || !category) {
-    toast({ title: 'Missing Fields', description: 'Please fill out all fields.', variant: 'destructive' });
+    toast({
+      title: 'Missing Fields',
+      description: 'Please fill out all fields.',
+      variant: 'destructive',
+    });
     return;
   }
+
+  setLoading(true); // ✅ START LOADING
 
   try {
     const courseData = new FormData();
@@ -68,9 +73,9 @@ const handleSubmit = async () => {
     courseData.append('description', description);
     courseData.append('price', price);
     courseData.append('duration', duration);
-    courseData.append('video', video);
+    courseData.append('video', video); // you're uploading a video URL, not a file
     courseData.append('category', category);
-    courseData.append('thumbnail', thumbnailFile); // 👈 file must go in as 'thumbnail'
+    courseData.append('thumbnail', thumbnailFile);
 
     await createCourse(courseData);
 
@@ -78,9 +83,16 @@ const handleSubmit = async () => {
     navigate('/courses');
   } catch (error) {
     console.error(error);
-    toast({ title: 'Error', description: 'Failed to create course', variant: 'destructive' });
+    toast({
+      title: 'Error',
+      description: 'Failed to create course',
+      variant: 'destructive',
+    });
+  } finally {
+    setLoading(false); // ✅ END LOADING
   }
 };
+
 
 
   return (
@@ -186,8 +198,20 @@ const handleSubmit = async () => {
 
             <div className="flex justify-end space-x-3">
               <Button variant="outline" type="button">Save as Draft</Button>
-              <Button onClick={handleSubmit} type="button" className="bg-wealthwise-700 hover:bg-wealthwise-800">
-                Publish Course
+              <Button
+                onClick={handleSubmit}
+                type="button"
+                className="bg-wealthwise-700 hover:bg-wealthwise-800"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="spinner border-t-2 border-white rounded-full w-4 h-4 animate-spin" />
+                    <span>Publishing...</span>
+                  </div>
+                ) : (
+                  'Publish Course'
+                )}
               </Button>
             </div>
           </CardContent>
