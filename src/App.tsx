@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import UpdateCourse from "./pages/UpdateCourse";
 import ProtectedRoute from './components/ProtectedRoute';
 import Register from "./components/Register";
+import Landing from "./pages/Landing";
 
 
 const queryClient = new QueryClient();
@@ -29,7 +30,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Landing />} />
           
           <Route
             path="/dashboard"
