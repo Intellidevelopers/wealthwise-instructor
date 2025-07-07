@@ -18,6 +18,8 @@ import Login from "./pages/Login";
 import UpdateCourse from "./pages/UpdateCourse";
 import ProtectedRoute from './components/ProtectedRoute';
 import Register from "./components/Register";
+import AddLesson from "./pages/AddLesson";
+import CourseLessons from "./pages/CourseLessons";
 
 
 const queryClient = new QueryClient();
@@ -113,6 +115,16 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/add-lesson/:courseId"
+            element={
+              <ProtectedRoute>
+                <AddLesson />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/courses/:courseId/lessons" element={<CourseLessons />} />
+
 
           <Route
             path="/login"

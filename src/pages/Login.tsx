@@ -25,33 +25,46 @@ const Login = ({ onLogin, onSignUp, onForgotPassword }: LoginProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    try {
-      const { token, user } = await loginInstructor(formData.email, formData.password);
-      
-      localStorage.setItem('instructorToken', token);
-      localStorage.setItem('instructorData', JSON.stringify(user));
+  try {
+    const { token, user } = await loginInstructor(formData.email, formData.password);
 
+    // ✅ Check if user has the "instructor" role
+    if (user.role !== 'instructor') {
       toast({
-        title: 'Login Successful',
-        description: `Welcome back, ${user.firstName}!`
-      });
-
-      navigate('/dashboard'); // ✅ Navigate to login screen
-      
-    } catch (error) {
-      toast({
-        title: 'Login Failed',
-        description: error?.response?.data?.message || 'Invalid email or password',
+        title: 'Access Denied',
+        description: 'Only instructors are allowed to log in here.',
         variant: 'destructive',
       });
-    } finally {
       setIsLoading(false);
+      return;
     }
-  };
+
+    // ✅ Save data if role is valid
+    localStorage.setItem('instructorToken', token);
+    localStorage.setItem('instructorData', JSON.stringify(user));
+
+    toast({
+      title: 'Login Successful',
+      description: `Welcome back, ${user.firstName}!`,
+    });
+
+    navigate('/dashboard'); // ✅ Proceed to dashboard
+
+  } catch (error) {
+    toast({
+      title: 'Login Failed',
+      description: error?.response?.data?.message || 'Invalid email or password',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({

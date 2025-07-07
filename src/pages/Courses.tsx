@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import {
-  Calendar,
   Users,
-  DollarSign,
   MoreVertical,
   Pencil,
   Trash,
+  Book,
 } from 'lucide-react';
 import {
   Card,
@@ -35,6 +34,7 @@ interface Course {
   thumbnail: string;
   students?: number;
   status?: 'Published' | 'Draft';
+  lessonCount?: number; // 👈 added
 }
 
 const Courses = () => {
@@ -43,14 +43,38 @@ const Courses = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
+  const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
 
+  // Fetch lesson count for a course
+  const fetchLessonCount = async (courseId: string): Promise<number> => {
+    try {
+      const token = localStorage.getItem('instructorToken');
+      const res = await axios.get(
+        `http://localhost:5000/api/lessons/count/${courseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data.totalLessons || 0;
+    } catch (err) {
+      console.error('Failed to fetch lesson count', err);
+      return 0;
+    }
+  };
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchCoursesWithLessonCounts = async () => {
       try {
-        const data = await getCourses();
-        setCourses(data);
+        const courses = await getCourses();
+        const updatedCourses = await Promise.all(
+          courses.map(async (course: Course) => {
+            const count = await fetchLessonCount(course._id);
+            return { ...course, lessonCount: count };
+          })
+        );
+        setCourses(updatedCourses);
       } catch (err) {
         console.error(err);
       } finally {
@@ -58,7 +82,7 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
       }
     };
 
-    fetchCourses();
+    fetchCoursesWithLessonCounts();
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -102,7 +126,6 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
         ) : courses.length === 0 ? (
           <p className="text-center text-gray-500">No courses found.</p>
         ) : (
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <Card key={course._id} className="hover:shadow-lg transition-shadow">
@@ -123,6 +146,13 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
+                          onClick={() => navigate(`/courses/${course._id}/lessons`)}
+                          className="cursor-pointer"
+                        >
+                          <Book className="mr-2 h-4 w-4" />
+                          View Lessons
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           onClick={() => navigate(`/update-course/${course._id}`)}
                           className="cursor-pointer"
                         >
@@ -139,7 +169,6 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
                           <Trash className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
-
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -152,25 +181,21 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
                       <span>{course.students || 0} students</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <span className='text-lg font-bold'>${course.price}</span>
+                      <span className="text-lg font-bold">${course.price}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        course.status === 'Published'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                      className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs"
                     >
-                      {course.status || 'Draft'}
+                      {course.lessonCount ?? 0} Lesson{course.lessonCount === 1 ? '' : 's'}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/update-course/${course._id}`)}
+                      onClick={() => navigate(`/add-lesson/${course._id}`)}
                     >
-                      Edit
+                      Add Lesson
                     </Button>
                   </div>
                 </CardContent>
@@ -179,38 +204,38 @@ const [courseToDelete, setCourseToDelete] = useState<string | null>(null);
           </div>
         )}
       </div>
-      {showDeleteModal && courseToDelete && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-    <div className="bg-white rounded-md shadow-lg p-6 max-w-sm w-full">
-      <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-      <p className="text-sm text-gray-700 mb-6">
-        Are you sure you want to delete this course? This action cannot be undone.
-      </p>
-      <div className="flex justify-end space-x-2">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setShowDeleteModal(false);
-            setCourseToDelete(null);
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          className="bg-red-600 text-white hover:bg-red-700"
-          onClick={async () => {
-            await handleDelete(courseToDelete);
-            setShowDeleteModal(false);
-            setCourseToDelete(null);
-          }}
-        >
-          Delete
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
 
+      {showDeleteModal && courseToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-md shadow-lg p-6 max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+            <p className="text-sm text-gray-700 mb-6">
+              Are you sure you want to delete this course? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setCourseToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 text-white hover:bg-red-700"
+                onClick={async () => {
+                  await handleDelete(courseToDelete);
+                  setShowDeleteModal(false);
+                  setCourseToDelete(null);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 };

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import type { AxiosProgressEvent } from 'axios';
 
+// const API_BASE_URL = 'http://localhost:5000'; // Replace with your actual backend base URL
 const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
-// const API_BASE_URL = 'https://wealthwise-api.onrender.com'; // Replace with your actual backend base URL
 
 export const signupInstructor = async (formData: {
   firstName: string;
@@ -292,4 +293,67 @@ export const getRecentUnreadMessages = async () => {
     },
   });
   return response.data; // should be [{ text, sender: { firstName, lastName, avatar }, createdAt }]
+};
+
+
+// src/api/auth.api.ts
+
+
+export const addLessonToCourseWithProgress = async (
+  courseId: string,
+  formData: FormData,
+  onUploadProgress: (progressEvent: AxiosProgressEvent) => void
+) => {
+  const token = localStorage.getItem('instructorToken');
+  if (!token) throw new Error('Instructor token not found');
+
+  const response = await axios.post(
+    `${API_BASE_URL}/api/lessons/${courseId}`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress, // ✅ pass progress handler
+      timeout: 120000, // optional timeout for large uploads
+    }
+  );
+
+  return response.data;
+};
+
+
+export const getLessonsByCourse = async (courseId: string) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(
+    `http://localhost:5000/api/lessons/${courseId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data.lessons; // assuming your backend returns { lessons: [...] }
+};
+
+
+export const getTotalLessonCount = async () => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(`${API_BASE_URL}/api/lessons/count`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data.totalLessons;
+};
+
+export const getLessonCountByCourse = async (courseId: string) => {
+  const token = localStorage.getItem('instructorToken');
+  const response = await axios.get(`${API_BASE_URL}/api/lessons/count/${courseId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data.totalLessons;
 };
