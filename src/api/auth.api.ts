@@ -294,8 +294,6 @@ export const getRecentUnreadMessages = async () => {
   });
   return response.data; // should be [{ text, sender: { firstName, lastName, avatar }, createdAt }]
 };
-
-
 // src/api/auth.api.ts
 
 

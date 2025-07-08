@@ -50,7 +50,7 @@ const Courses = () => {
     try {
       const token = localStorage.getItem('instructorToken');
       const res = await axios.get(
-        `http://localhost:5000/api/lessons/count/${courseId}`,
+        `https://wealthwise-api.onrender.com/api/lessons/count/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
