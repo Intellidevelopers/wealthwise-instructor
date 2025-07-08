@@ -327,7 +327,7 @@ export const addLessonToCourseWithProgress = async (
 export const getLessonsByCourse = async (courseId: string) => {
   const token = localStorage.getItem('instructorToken');
   const response = await axios.get(
-    `http://localhost:5000/api/lessons/${courseId}`,
+    `${API_BASE_URL}/api/lessons/${courseId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
