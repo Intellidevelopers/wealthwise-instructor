@@ -158,6 +158,22 @@ const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   }
 };
 
+const [greeting, setGreeting] = useState('Good morning');
+
+useEffect(() => {
+  const updateGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 18) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
+  };
+
+  updateGreeting(); // initial call
+
+  const interval = setInterval(updateGreeting, 60 * 1000); // update every minute
+  return () => clearInterval(interval);
+}, []);
+
 
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
@@ -170,7 +186,7 @@ const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
-            Good morning, {instructorName}!
+            {greeting}, {instructorName}!
           </h1>
           <p className="text-sm text-gray-600 mt-1">
             Ready to inspire your students today?
