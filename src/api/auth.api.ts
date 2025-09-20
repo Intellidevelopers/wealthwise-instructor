@@ -355,3 +355,17 @@ export const getLessonCountByCourse = async (courseId: string) => {
   });
   return response.data.totalLessons;
 };
+
+export const forgotPassword = async (email: string) => {
+  const response = await axios.post(`${API_BASE_URL}/api/auth/forgot-password`, { email });
+  return response.data;
+};
+
+export const resetPassword = async (token: string, password: string, confirmPassword: string) => {
+  const response = await axios.post(`${API_BASE_URL}/api/auth/reset-password`, {
+    token,
+    password,
+    confirmPassword,
+  });
+  return response.data;
+};

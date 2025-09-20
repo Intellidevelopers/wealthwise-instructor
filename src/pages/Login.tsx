@@ -116,7 +116,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
           <button 
             type="button" 
-            onClick={onForgotPassword}
+            onClick={() => navigate('/forgot-password')}
             className="text-sm text-wealthwise-700 hover:underline"
           >
             Forgot Password?

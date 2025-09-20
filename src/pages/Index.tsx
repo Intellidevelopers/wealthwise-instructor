@@ -1,49 +1,60 @@
-
 import React, { useState } from 'react';
 import Register from '@/components/Register';
 import OTPVerification from '@/components/OTPVerification';
-import Login from '../pages/Login';
+import Login from '@/pages/Login';
 import ForgotPassword from '@/components/ForgotPassword';
 import ResetPassword from '@/components/ResetPassword';
-import Dashboard from './Dashboard';
+import Dashboard from '@/pages/Dashboard'; // make sure path is correct
 
 type AuthStep = 'login' | 'register' | 'otp' | 'forgot-password' | 'reset-password' | 'dashboard';
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<AuthStep>('login');
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const handleAuthComplete = () => {
-    setCurrentStep('login');
+    setCurrentStep('dashboard'); // move to dashboard after login or OTP
   };
 
-  const renderCurrentStep = () => {
+  const renderStep = () => {
     switch (currentStep) {
       case 'register':
-  return (
-    <Register 
-      onNext={() => setCurrentStep('otp')}
-      onSignIn={() => setCurrentStep('login')} // ✅ Add this
-    />
-  );
+        return (
+          <Register
+            onNext={(email?: string) => {
+              if (email) setRegisteredEmail(email);
+              setCurrentStep('otp');
+            }}
+            onSignIn={() => setCurrentStep('login')}
+          />
+        );
 
       case 'otp':
-        return <OTPVerification onNext={handleAuthComplete} />;
+        return (
+          <OTPVerification
+            email={registeredEmail || localStorage.getItem('instructorEmail') || ''}
+            onNext={handleAuthComplete}
+            onBack={() => setCurrentStep('register')}
+          />
+        );
+
       case 'forgot-password':
         return (
-          <ForgotPassword 
+          <ForgotPassword
             onBack={() => setCurrentStep('login')}
             onNext={() => setCurrentStep('reset-password')}
           />
         );
+
       case 'reset-password':
         return <ResetPassword onComplete={() => setCurrentStep('login')} />;
+
       case 'dashboard':
+        return <Dashboard />;
+
+      default: // login
         return (
-          <Dashboard/>
-        );
-      default:
-        return (
-          <Login 
+          <Login
             onLogin={handleAuthComplete}
             onSignUp={() => setCurrentStep('register')}
             onForgotPassword={() => setCurrentStep('forgot-password')}
@@ -52,7 +63,7 @@ const Index = () => {
     }
   };
 
-  return renderCurrentStep();
+  return renderStep();
 };
 
 export default Index;

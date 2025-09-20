@@ -89,7 +89,11 @@ export function RecentActivity() {
               <DialogTitle>All Activities</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              {activities.map((activity) => renderActivityItem(activity))}
+              {activities.length > 0 ? (
+                activities.map((activity) => renderActivityItem(activity))
+              ) : (
+                <p className="text-center text-gray-500 py-4">No activities available.</p>
+              )}
             </div>
           </DialogContent>
         </Dialog>
@@ -97,7 +101,11 @@ export function RecentActivity() {
 
       <CardContent>
         <div className="space-y-4">
-          {activities.slice(0, 5).map((activity) => renderActivityItem(activity))}
+          {activities.length > 0 ? (
+            activities.slice(0, 5).map((activity) => renderActivityItem(activity))
+          ) : (
+            <p className="text-center text-gray-500 py-4">No recent activity.</p>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -64,65 +64,6 @@ const Dashboard = () => {
           <div className="lg:col-span-2">
             <RecentActivity />
           </div>
-          <div>
-            <UpcomingTasks />
-          </div>
-        </div>
-
-        {/* Additional Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Monthly Progress */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                Monthly Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <ProgressRow label="Course Completion" value={78} />
-                <ProgressRow label="Student Engagement" value={92} />
-                <ProgressRow label="Revenue Goal" value={65} />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button className="w-full justify-start bg-wealthwise-700 hover:bg-wealthwise-800">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Schedule Session
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="w-4 h-4 mr-2" />
-                  Message Students
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  View Earnings
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Performance Metrics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>This Week</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PerformanceRow label="Sessions Conducted" value={12} />
-              <PerformanceRow label="Assignments Graded" value={45} />
-              <PerformanceRow label="Messages Replied" value={28} />
-              <PerformanceRow label="Course Updates" value={6} />
-            </CardContent>
-          </Card>
         </div>
       </div>
     </DashboardLayout>

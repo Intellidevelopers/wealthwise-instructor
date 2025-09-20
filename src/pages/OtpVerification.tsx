@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import AuthLayout from './AuthLayout';
+import AuthLayout from '../components/AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { verifyOtp } from '@/api/auth.api';
 

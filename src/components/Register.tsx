@@ -6,18 +6,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AuthLayout from './AuthLayout';
 import { useToast } from '@/hooks/use-toast';
 import { signupInstructor } from '@/api/auth.api';
-import { useNavigate } from 'react-router-dom';
-
+import { Navigate, useNavigate } from 'react-router-dom';
 
 interface RegisterProps {
-  onNext: () => void;
-  onSignIn?: () => void;
+  onNext: () => void;       // ✅ called to go to OTP
+  onSignIn?: () => void;    // optional callback to go back to login
 }
 
 const Register = ({ onNext, onSignIn }: RegisterProps) => {
   const [isLoading, setIsLoading] = useState(false);
-const navigate = useNavigate();
-
+const navigate = useNavigate(); // ✅ get navigate function
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -30,61 +28,64 @@ const navigate = useNavigate();
 
   const { toast } = useToast();
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (formData.password !== formData.confirmPassword) {
-    toast({
-      title: 'Error',
-      description: 'Passwords do not match',
-      variant: 'destructive',
-    });
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: 'Error',
+        description: 'Passwords do not match',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-  if (!formData.agreeTerms) {
-    toast({
-      title: 'Error',
-      description: 'Please agree to the terms and conditions',
-      variant: 'destructive',
-    });
-    return;
-  }
+    if (!formData.agreeTerms) {
+      toast({
+        title: 'Error',
+        description: 'Please agree to the terms and conditions',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const { userId } = await signupInstructor({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-    });
+    try {
+      const { userId } = await signupInstructor({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
 
-    localStorage.setItem('instructorUserId', userId);
-    localStorage.setItem('instructorEmail', formData.email);
+      // Save to localStorage for OTP verification
+      localStorage.setItem('instructorUserId', userId);
+      localStorage.setItem('instructorEmail', formData.email);
 
-    toast({
-      title: 'Registration Successful',
-      description: 'OTP sent to your email address',
-    });
+      toast({
+        title: 'Registration Successful',
+        description: 'OTP sent to your email address',
+      });
 
-    onNext();
-  } catch (error) {
-    toast({
-      title: 'Signup Failed',
-      description: error?.response?.data?.message || 'Something went wrong',
-      variant: 'destructive',
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+      // ✅ Move to OTP step via parent callback
+      // inside handleSubmit after successful signup:
+     navigate('/otp-verification');
 
+    } catch (error) {
+      toast({
+        title: 'Signup Failed',
+        description: error?.response?.data?.message || 'Something went wrong',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
@@ -186,14 +187,12 @@ const navigate = useNavigate();
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
 
-
         <div className="text-center">
           <span className="text-sm text-gray-600">
             Already have an account?{' '}
             <button
               type="button"
               onClick={() => navigate('/login')}
-
               className="text-wealthwise-700 font-medium hover:underline"
             >
               Sign In

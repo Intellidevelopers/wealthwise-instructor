@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, PhoneCallIcon, Send, Video, View } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -199,12 +199,13 @@ useEffect(() => {
 
           {/* Chat Window */}
           <Card className="lg:col-span-2">
-            <CardHeader>
+           <CardHeader className="flex-row justify-between">
               <CardTitle className="flex items-center space-x-2">
                 <MessageSquare className="w-5 h-5" />
                 <span>{activeConversation?.participant?.firstName || 'Select a chat'}</span>
               </CardTitle>
             </CardHeader>
+
             <CardContent className="flex flex-col h-full">
               <div className="flex-1 space-y-4 mb-4 overflow-y-auto max-h-[450px] pr-2">
                   {messages.length === 0 ? (

@@ -22,6 +22,8 @@ const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(''); // 👈 search
+  const [filterCourse, setFilterCourse] = useState(''); // 👈 filter by course
   const studentsPerPage = 10;
   const { toast } = useToast();
 
@@ -45,11 +47,24 @@ const Students = () => {
     fetchStudents();
   }, [toast]);
 
+  // Filtered and searched students
+  const filteredStudents = students.filter((student) => {
+    const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+    const email = student.email.toLowerCase();
+    const course = student.courseTitle.toLowerCase();
+
+    return (
+      (fullName.includes(searchTerm.toLowerCase()) ||
+        email.includes(searchTerm.toLowerCase())) &&
+      (filterCourse ? course === filterCourse.toLowerCase() : true)
+    );
+  });
+
   // Pagination logic
   const indexOfLast = currentPage * studentsPerPage;
   const indexOfFirst = indexOfLast - studentsPerPage;
-  const currentStudents = students.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(students.length / studentsPerPage);
+  const currentStudents = filteredStudents.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -62,15 +77,29 @@ const Students = () => {
           <div className="flex space-x-2">
             <div className="relative">
               <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input placeholder="Search students..." className="pl-10 w-64" />
+              <Input
+                placeholder="Search students..."
+                className="pl-10 w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
+            <select
+              value={filterCourse}
+              onChange={(e) => setFilterCourse(e.target.value)}
+              className="border rounded px-2 py-1"
+            >
+              <option value="">All Courses</option>
+              {[...new Set(students.map((s) => s.courseTitle))].map((course) => (
+                <option key={course} value={course}>
+                  {course}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
+        {/* Table and pagination */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -81,8 +110,8 @@ const Students = () => {
           <CardContent>
             {loading ? (
               <p className="text-gray-500 text-center">Loading students...</p>
-            ) : students.length === 0 ? (
-              <p className="text-gray-500 text-center">No students enrolled yet.</p>
+            ) : filteredStudents.length === 0 ? (
+              <p className="text-gray-500 text-center">No students found.</p>
             ) : (
               <>
                 <div className="overflow-x-auto">
@@ -111,16 +140,11 @@ const Students = () => {
                               <p className="font-medium">{student.firstName} {student.lastName}</p>
                             </div>
                           </td>
-
                           <td className="px-4 py-2 whitespace-nowrap">{student.email}</td>
                           <td className="px-4 py-2 whitespace-nowrap">{student.courseTitle}</td>
+                          <td className="px-4 py-2 whitespace-nowrap">{new Date(student.enrolledAt).toLocaleDateString()}</td>
                           <td className="px-4 py-2 whitespace-nowrap">
-                            {new Date(student.enrolledAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap">
-                            <Button size="sm" variant="outline">
-                              View Details
-                            </Button>
+                            <Button size="sm" variant="outline">View Details</Button>
                           </td>
                         </tr>
                       ))}
@@ -160,5 +184,4 @@ const Students = () => {
     </DashboardLayout>
   );
 };
-
 export default Students;

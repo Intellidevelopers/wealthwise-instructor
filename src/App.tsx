@@ -20,6 +20,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Register from "./components/Register";
 import AddLesson from "./pages/AddLesson";
 import CourseLessons from "./pages/CourseLessons";
+import OTPVerification from "./components/OTPVerification";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 const queryClient = new QueryClient();
@@ -146,6 +149,12 @@ const App = () => (
               />
             }
           />
+          <Route path="/otp-verification" element={<OTPVerification email={""} onNext={function (): void {
+            throw new Error("Function not implemented.");
+          } }/>} />
+          <Route path="/forgot-password" element={<ForgotPassword onBack={() => {}}/>} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
 
           <Route path="*" element={<NotFound />} />
         </Routes>
