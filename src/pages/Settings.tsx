@@ -31,7 +31,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/instructor/settings', {
+        const res = await fetch('https://wealthwise-api.onrender.com/api/instructor/settings', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
   const toggleSetting = async (key: keyof InstructorSettings) => {
     try {
       const updatedValue = !settings[key];
-      const res = await fetch('http://localhost:5000/api/instructor/settings', {
+      const res = await fetch('https://wealthwise-api.onrender.com/api/instructor/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
 // ✅ Delete account handler
   const handleDeleteAccount = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/instructor/delete-account', {
+      const res = await fetch('https://wealthwise-api.onrender.com/api/instructor/delete-account', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
