@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Users, Wallet, Bell, TrendingUp, TrendingDown } from 'lucide-react';
+import { Calendar, Users, Wallet, Bell, TrendingUp, TrendingDown, BookCheck } from 'lucide-react';
 import { getInstructorStats } from '../api/auth.api'; // ✅ import function
 import { toast } from 'sonner';
 
@@ -8,8 +8,7 @@ export function DashboardStats() {
   const [stats, setStats] = useState({
     totalCourses: 0,
     totalStudents: 0,
-    totalEarnings: 0,
-    pendingTasks: 0,
+    totalEnrollments: 0,
   });
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export function DashboardStats() {
     {
       title: 'Total Courses',
       value: stats.totalCourses,
-      change: '+2 this month',
+      change: 'Total published courses',
       icon: Calendar,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
@@ -38,17 +37,17 @@ export function DashboardStats() {
     {
       title: 'Students Enrolled',
       value: stats.totalStudents,
-      change: '+89 this week',
+      change: 'Total enrolled students',
       icon: Users,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
       trend: 'up',
     },
     {
-      title: 'Total Earnings',
-      value: `$${stats.totalEarnings.toLocaleString()}`,
-      change: '+12% from last month',
-      icon: Wallet,
+      title: 'Total Enrollments',
+      value: `${stats.totalEnrollments}`,
+      change: 'Enrollments steady',
+      icon: BookCheck,
       color: 'text-wealthwise-600',
       bgColor: 'bg-wealthwise-100',
       trend: 'up',
