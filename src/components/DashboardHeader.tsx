@@ -269,20 +269,24 @@ const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 </Popover>
 
 {/* Avatar */}
-          <Avatar className="w-8 h-8">
-            {profile?.avatar ? (
-              <AvatarImage src={profile.avatar} alt="Avatar" />
-            ) : (
-              <User className="w-16 h-16 text-wealthwise-700 mx-auto mt-8" />
-            )}
-            <AvatarFallback>
-              {instructorName
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+<Avatar
+  className="w-8 h-8 cursor-pointer"
+  onClick={() => navigate('/profile')}
+>
+  {profile?.avatar ? (
+    <AvatarImage src={profile.avatar} alt="Avatar" />
+  ) : (
+    <User className="w-16 h-16 text-wealthwise-700 mx-auto mt-8" />
+  )}
+  <AvatarFallback>
+    {instructorName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()}
+  </AvatarFallback>
+</Avatar>
+
         </div>
       </div>
     </header>
