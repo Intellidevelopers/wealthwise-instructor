@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 import { forgotPassword } from '@/api/auth.api';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface ForgotPasswordProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ interface ForgotPasswordProps {
 const ForgotPassword = ({ onBack }: ForgotPasswordProps) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +59,7 @@ const ForgotPassword = ({ onBack }: ForgotPasswordProps) => {
 
         <button
           type="button"
-          onClick={onBack}
+          onClick={() => navigate('/login')}
           className="w-full flex items-center justify-center space-x-2 text-sm text-gray-600 hover:text-wealthwise-700 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
