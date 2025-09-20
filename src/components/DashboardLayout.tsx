@@ -35,7 +35,7 @@ const menuItems = [
   { title: 'Students', url: '/students', icon: Users },
   { title: 'Messages', url: '/messages', icon: MessageSquare },
   { title: 'Notifications', url: '/notifications', icon: Bell },
-  { title: 'Wallet', url: '/wallet', icon: Wallet },
+  // { title: 'Wallet', url: '/wallet', icon: Wallet },
   { title: 'Profile', url: '/profile', icon: User },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];

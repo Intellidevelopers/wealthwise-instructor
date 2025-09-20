@@ -41,6 +41,16 @@ interface MessagePreview {
   conversationId: string;
 }
 
+interface Notification {
+  _id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  read: boolean;
+}
+
+
+
 export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   const [instructorName, setInstructorName] = useState('Instructor');
   const [profile, setProfile] = useState<InstructorProfile | null>(null);
@@ -50,6 +60,8 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   const { toast } = useToast();
   const socket = useRef<Socket | null>(null);
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+const [showNotifDropdown, setShowNotifDropdown] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('instructorData');
@@ -121,6 +133,32 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
     navigate(`/messages/${msg.sender._id}?name=${msg.sender.firstName} ${msg.sender.lastName}`);
   };
 
+  const fetchActivities = async () => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/instructor/activities`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('instructorToken')}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch activities');
+    const data = await res.json();
+
+    // Map activities to notification format
+    const activityNotifications: Notification[] = data.map((act) => ({
+      _id: act._id,
+      title: `${act.student.firstName} ${act.student.lastName}`,
+      body: `${act.action} in course ${act.courseTitle || ''}`, // example field
+      createdAt: act.createdAt,
+      read: false,
+    }));
+
+    setNotifications(activityNotifications);
+  } catch (err) {
+    console.error('Activity fetch error:', err);
+  }
+};
+
+
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
       <div className="flex items-center justify-between">
@@ -190,17 +228,47 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
             </PopoverContent>
           </Popover>
 
-          {/* Notifications */}
-          <div className="relative">
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="w-5 h-5" />
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs p-0 flex items-center justify-center">
-                5
-              </Badge>
-            </Button>
-          </div>
+          {/* Avatar *{/* Notifications */}
+<Popover open={showNotifDropdown} onOpenChange={setShowNotifDropdown}>
+  <PopoverTrigger asChild>
+    <Button variant="ghost" size="sm" className="relative">
+      <Bell className="w-5 h-5" />
+      {notifications.filter(n => !n.read).length > 0 && (
+        <Badge className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs p-0 flex items-center justify-center">
+          {notifications.filter(n => !n.read).length}
+        </Badge>
+      )}
+    </Button>
+  </PopoverTrigger>
+  <PopoverContent align="end" className="w-96 max-h-96 overflow-auto p-3 space-y-3">
+  <h4 className="text-sm font-medium text-gray-800">Notifications & Activities</h4>
+  {notifications.length === 0 ? (
+    <p className="text-sm text-gray-500">No new notifications</p>
+  ) : (
+    notifications.map((notif) => (
+      <div
+        key={notif._id}
+        className={`p-2 rounded-md cursor-pointer ${!notif.read ? 'bg-gray-100' : ''}`}
+        onClick={() => {
+          // Mark as read
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/instructor/notifications/${notif._id}/read`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${localStorage.getItem('instructorToken')}` },
+          });
+          setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, read: true } : n));
+        }}
+      >
+        <p className="text-sm font-semibold text-gray-900">{notif.title}</p>
+        <p className="text-sm text-gray-600 line-clamp-2">{notif.body}</p>
+        <p className="text-xs text-gray-400">{moment(notif.createdAt).fromNow()}</p>
+      </div>
+    ))
+  )}
+</PopoverContent>
 
-          {/* Avatar */}
+</Popover>
+
+{/* Avatar */}
           <Avatar className="w-8 h-8">
             {profile?.avatar ? (
               <AvatarImage src={profile.avatar} alt="Avatar" />

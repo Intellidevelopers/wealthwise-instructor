@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { DialogHeader, DialogFooter } from '@/components/ui/dialog';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import ResetPasswordModal from '@/components/ResetPasswordModal';
 
 interface InstructorSettings {
   emailNotifications: boolean;
@@ -23,10 +24,11 @@ const Settings = () => {
     newMessages: true,
   });
   const [loading, setLoading] = useState(true);
-const navigate = useNavigate();
-  // Replace with your actual token source (e.g., from localStorage, context, or cookie)
+  const navigate = useNavigate();
   const token = localStorage.getItem('instructorToken') || '';
-const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal state
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+
   // Fetch settings on mount
   useEffect(() => {
     const fetchSettings = async () => {
@@ -170,7 +172,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
               <div className="space-y-2">
                 <h4 className="font-medium">Change Password</h4>
                 <p className="text-sm text-gray-600">Update your account password</p>
-                <Button variant="outline">Change Password</Button>
+                <Button variant="outline" onClick={() => setResetModalOpen(true)}>Change Password</Button>
               </div>
             </CardContent>
           </Card>
@@ -192,7 +194,7 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
           </Card>
 
           <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-          <DialogContent>
+          <DialogContent style={{ width: '90%' }}>
             <DialogHeader>
               <DialogTitle>Confirm Account Deletion</DialogTitle>
             </DialogHeader>
@@ -207,6 +209,8 @@ const [deleteModalOpen, setDeleteModalOpen] = useState(false); // ✅ modal stat
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        <ResetPasswordModal open={resetModalOpen} onOpenChange={setResetModalOpen} />
+
         </div>
 
     </div>
